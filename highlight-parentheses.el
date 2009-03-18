@@ -32,6 +32,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added setter for color variables.
+;;
 ;; 2007-07-30 (1.0)
 ;;    Added background highlighting and faces.
 ;;
@@ -50,21 +52,24 @@
   :group 'faces
   :group 'matching)
 
-(defvar hl-paren-overlays nil
-  "This buffers currently active overlays.")
-(make-variable-buffer-local 'hl-paren-overlays)
+(defun hl-paren-set (variable value)
+  (set variable value)
+  (when (fboundp 'hl-paren-color-update)
+    (hl-paren-color-update)))
 
 (defcustom hl-paren-colors
-  '("firebrick1" "IndianRed4" "IndianRed")
+  '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4")
   "*List of colors for the highlighted parentheses.
 The list starts with the the inside parentheses and moves outwards."
   :type '(repeat color)
+  :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-background-colors nil
   "*List of colors for the background highlighted parentheses.
 The list starts with the the inside parentheses and moves outwards."
   :type '(repeat color)
+  :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defface hl-paren-face nil
@@ -135,6 +140,16 @@ This is used to prevent analyzing the same context over and over.")
         (push (make-overlay 0 0) hl-paren-overlays)
         (overlay-put (car hl-paren-overlays) 'face attributes)))
     (setq hl-paren-overlays (nreverse hl-paren-overlays))))
+
+(defun hl-paren-color-update ()
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when hl-paren-overlays
+        (mapc 'delete-overlay hl-paren-overlays)
+        (setq hl-paren-overlays nil)
+        (hl-paren-create-overlays)
+        (let ((hl-paren-last-point -1)) ;; force update
+          (hl-paren-highlight))))))
 
 (provide 'highlight-parentheses)
 
