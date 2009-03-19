@@ -1,9 +1,9 @@
 ;;; highlight-parentheses.el --- highlight surrounding parentheses
 ;;
-;; Copyright (C) 2007 Nikolaj Schumacher
+;; Copyright (C) 2007, 2009 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0
+;; Version: 1.0.1
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-parentheses/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x
@@ -32,6 +32,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2009-03-19 (1.0.1)
 ;;    Added setter for color variables.
 ;;
 ;; 2007-07-30 (1.0)
