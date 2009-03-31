@@ -120,7 +120,7 @@ This is used to prevent analyzing the same context over and over.")
         (add-hook 'post-command-hook 'hl-paren-highlight nil t))
     (mapc 'delete-overlay hl-paren-overlays)
     (kill-local-variable 'hl-paren-overlays)
-    (kill-local-variable 'hl-paren-point)
+    (kill-local-variable 'hl-paren-last-point)
     (remove-hook 'post-command-hook 'hl-paren-highlight t)))
 
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
