@@ -32,6 +32,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Fixed bug causing last color not to be displayed.
+;;
 ;; 2009-03-19 (1.0.1)
 ;;    Added setter for color variables.
 ;;
@@ -100,7 +102,7 @@ This is used to prevent analyzing the same context over and over.")
       (save-excursion
         (condition-case err
             (while (and (setq pos1 (cadr (syntax-ppss pos1)))
-                        (cddr overlays))
+                        (cdr overlays))
               (move-overlay (pop overlays) pos1 (1+ pos1))
               (when (setq pos2 (scan-sexps pos1 1))
                 (move-overlay (pop overlays) (1- pos2) pos2)
