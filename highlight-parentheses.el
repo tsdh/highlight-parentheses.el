@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007, 2009 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.1
+;; Version: 1.0.2
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-parentheses/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
@@ -32,6 +32,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2013-03-22 (1.0.2)
 ;;    Fixed bug causing last color not to be displayed.
 ;;
 ;; 2009-03-19 (1.0.1)
