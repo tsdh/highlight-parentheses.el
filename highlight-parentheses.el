@@ -62,21 +62,21 @@
 
 (defcustom hl-paren-colors
   '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4")
-  "*List of colors for the highlighted parentheses.
+  "List of colors for the highlighted parentheses.
 The list starts with the the inside parentheses and moves outwards."
   :type '(repeat color)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-background-colors nil
-  "*List of colors for the background highlighted parentheses.
+  "List of colors for the background highlighted parentheses.
 The list starts with the the inside parentheses and moves outwards."
   :type '(repeat color)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defface hl-paren-face nil
-  "*Face used for highlighting parentheses.
+  "Face used for highlighting parentheses.
 Color attributes might be overriden by `hl-paren-colors' and
 `hl-paren-background-colors'."
   :group 'highlight-parentheses)
