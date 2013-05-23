@@ -1,6 +1,6 @@
 ;;; highlight-parentheses.el --- highlight surrounding parentheses
 ;;
-;; Copyright (C) 2007, 2009 Nikolaj Schumacher
+;; Copyright (C) 2007, 2009, 2013 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
 ;; Version: 1.0.2
