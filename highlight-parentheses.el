@@ -32,6 +32,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Protect against double initialization (if used in `c-mode-hook').
+;;
 ;; 2013-03-22 (1.0.2)
 ;;    Fixed bug causing last color not to be displayed.
 ;;
@@ -117,14 +119,13 @@ This is used to prevent analyzing the same context over and over.")
 (define-minor-mode highlight-parentheses-mode
   "Minor mode to highlight the surrounding parentheses."
   nil " hl-p" nil
-  (if highlight-parentheses-mode
-      (progn
-        (hl-paren-create-overlays)
-        (add-hook 'post-command-hook 'hl-paren-highlight nil t))
-    (mapc 'delete-overlay hl-paren-overlays)
-    (kill-local-variable 'hl-paren-overlays)
-    (kill-local-variable 'hl-paren-last-point)
-    (remove-hook 'post-command-hook 'hl-paren-highlight t)))
+  (mapc 'delete-overlay hl-paren-overlays)
+  (kill-local-variable 'hl-paren-overlays)
+  (kill-local-variable 'hl-paren-last-point)
+  (remove-hook 'post-command-hook 'hl-paren-highlight t)
+  (when highlight-parentheses-mode
+    (hl-paren-create-overlays)
+    (add-hook 'post-command-hook 'hl-paren-highlight nil t)))
 
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
