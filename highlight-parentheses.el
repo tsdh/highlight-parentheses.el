@@ -72,6 +72,14 @@ The list starts with the the inside parentheses and moves outwards."
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
+(defcustom hl-paren-weights
+  '(normal, normal, normal, normal)
+  "List of weights for the highlighted parentheses.
+The list starts with the the inside parentheses and moves outwards."
+  :type '(repeat color)
+  :set 'hl-paren-set
+  :group 'highlight-parentheses)
+
 (defcustom hl-paren-background-colors nil
   "List of colors for the background highlighted parentheses.
 The list starts with the the inside parentheses and moves outwards."
@@ -133,12 +141,16 @@ This is used to prevent analyzing the same context over and over.")
 (defun hl-paren-create-overlays ()
   (let ((fg hl-paren-colors)
         (bg hl-paren-background-colors)
+        (weight hl-paren-weights)
         attributes)
-    (while (or fg bg)
+    (while (or fg bg weight)
       (setq attributes (face-attr-construct 'hl-paren-face))
       (when (car fg)
         (setq attributes (plist-put attributes :foreground (car fg))))
       (pop fg)
+      (when (car weight)
+        (setq attributes (plist-put attributes :weight (car weight))))
+      (pop weight)
       (when (car bg)
         (setq attributes (plist-put attributes :background (car bg))))
       (pop bg)
