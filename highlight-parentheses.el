@@ -73,10 +73,10 @@ The list starts with the the inside parentheses and moves outwards."
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-weights
-  '(normal, normal, normal, normal)
+  '(normal normal normal normal)
   "List of weights for the highlighted parentheses.
 The list starts with the the inside parentheses and moves outwards."
-  :type '(repeat color)
+  :type '(repeat const)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
