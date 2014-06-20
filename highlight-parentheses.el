@@ -128,6 +128,11 @@ This is used to prevent analyzing the same context over and over.")
     (hl-paren-create-overlays)
     (add-hook 'post-command-hook 'hl-paren-highlight nil t)))
 
+;;;###autoload
+(define-globalized-minor-mode global-highlight-parentheses-mode
+  highlight-parentheses-mode
+  (lambda () (highlight-parentheses-mode 1)))
+
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun hl-paren-create-overlays ()
