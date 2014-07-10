@@ -113,8 +113,7 @@ This is used to prevent analyzing the same context over and over.")
                 ))
           (error nil))
         (goto-char pos))
-      (dolist (ov overlays)
-        (move-overlay ov 1 1)))))
+      (mapc 'delete-overlay overlays))))
 
 ;;;###autoload
 (define-minor-mode highlight-parentheses-mode
@@ -140,6 +139,7 @@ This is used to prevent analyzing the same context over and over.")
     (dotimes (twice 2)
       (let ((o (make-overlay 0 0)))
         (overlay-put o 'face face)
+        (overlay-put o 'category 'highlight-parentheses-mode)
         (push o hl-paren-overlays))))
   (setq hl-paren-overlays (nreverse hl-paren-overlays)))
 
