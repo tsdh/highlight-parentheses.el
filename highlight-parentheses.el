@@ -131,7 +131,7 @@ This is used to prevent analyzing the same context over and over.")
 ;;;###autoload
 (define-globalized-minor-mode global-highlight-parentheses-mode
   highlight-parentheses-mode
-  (lambda () (highlight-parentheses-mode 1)))
+  highlight-parentheses-mode)
 
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
