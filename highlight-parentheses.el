@@ -59,31 +59,31 @@
   :group 'faces
   :group 'matching)
 
-(defun hl-paren-set (variable value)
-  (set variable value)
-  (when (fboundp 'hl-paren-color-update)
-    (hl-paren-color-update)))
-
-(defcustom hl-paren-colors
-  '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4")
-  "List of colors for the highlighted parentheses.
-The list starts with the the inside parentheses and moves outwards."
-  :type '(repeat color)
-  :set 'hl-paren-set
+;; Another reasonable setting would be
+;; (t (:inherit 'show-paren-match))
+(defface hl-paren+1
+  '((t (:foreground "firebrick1")))
+  "Face to highlight inner-most enclosing parentheses."
   :group 'highlight-parentheses)
 
-(defcustom hl-paren-background-colors nil
-  "List of colors for the background highlighted parentheses.
-The list starts with the the inside parentheses and moves outwards."
-  :type '(repeat color)
-  :set 'hl-paren-set
+(defface hl-paren+2
+  '((t (:foreground "indianred1")))
+  "Face to highlight 2nd inner-most enclosing parentheses."
   :group 'highlight-parentheses)
 
-(defface hl-paren-face nil
-  "Face used for highlighting parentheses.
-Color attributes might be overriden by `hl-paren-colors' and
-`hl-paren-background-colors'."
+(defface hl-paren+3
+  '((t (:foreground "indianred3")))
+  "Face to highlight 3rd inner-most enclosing parentheses."
   :group 'highlight-parentheses)
+
+(defface hl-paren+4
+  '((t (:foreground "indianred4")))
+  "Face to highlight 4th inner-most enclosing parentheses."
+  :group 'highlight-parentheses)
+
+(defvar hl-paren-faces
+  '(hl-paren+1 hl-paren+2 hl-paren+3 hl-paren+4)
+  "List of faces use in highlight-parentheses.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -113,8 +113,7 @@ This is used to prevent analyzing the same context over and over.")
                 ))
           (error nil))
         (goto-char pos))
-      (dolist (ov overlays)
-        (move-overlay ov 1 1)))))
+      (mapc 'delete-overlay overlays))))
 
 ;;;###autoload
 (define-minor-mode highlight-parentheses-mode
@@ -131,36 +130,18 @@ This is used to prevent analyzing the same context over and over.")
 ;;;###autoload
 (define-globalized-minor-mode global-highlight-parentheses-mode
   highlight-parentheses-mode
-  (lambda () (highlight-parentheses-mode 1)))
+  highlight-parentheses-mode)
 
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun hl-paren-create-overlays ()
-  (let ((fg hl-paren-colors)
-        (bg hl-paren-background-colors)
-        attributes)
-    (while (or fg bg)
-      (setq attributes (face-attr-construct 'hl-paren-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
-      (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
-      (pop bg)
-      (dotimes (i 2) ;; front and back
-        (push (make-overlay 0 0) hl-paren-overlays)
-        (overlay-put (car hl-paren-overlays) 'face attributes)))
-    (setq hl-paren-overlays (nreverse hl-paren-overlays))))
-
-(defun hl-paren-color-update ()
-  (dolist (buffer (buffer-list))
-    (with-current-buffer buffer
-      (when hl-paren-overlays
-        (mapc 'delete-overlay hl-paren-overlays)
-        (setq hl-paren-overlays nil)
-        (hl-paren-create-overlays)
-        (let ((hl-paren-last-point -1)) ;; force update
-          (hl-paren-highlight))))))
+  (dolist (face hl-paren-faces)
+    (dotimes (twice 2)
+      (let ((o (make-overlay 0 0)))
+        (overlay-put o 'face face)
+        (overlay-put o 'category 'highlight-parentheses-mode)
+        (push o hl-paren-overlays))))
+  (setq hl-paren-overlays (nreverse hl-paren-overlays)))
 
 (provide 'highlight-parentheses)
 
