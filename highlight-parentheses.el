@@ -1,9 +1,9 @@
 ;;; highlight-parentheses.el --- highlight surrounding parentheses
 ;;
-;; Copyright (C) 2007, 2009, 2013 Nikolaj Schumacher
+;; Copyright (C) 2007, 2009, 2013, 2014 Nikolaj Schumacher, Tim Perkins
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.2
+;; Version: 1.0.3
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-parentheses/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
@@ -34,6 +34,9 @@
 ;;; Change Log:
 ;;
 ;;    Protect against double initialization (if used in `c-mode-hook').
+;;
+;; 2014-08-01 (1.0.3)
+;;    Added option to highlight adjacent parens (like show-paren-mode).
 ;;
 ;; 2013-03-22 (1.0.2)
 ;;    Fixed bug causing last color not to be displayed.
@@ -79,6 +82,12 @@ The list starts with the the inside parentheses and moves outwards."
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
+(defcustom hl-paren-highlight-adjacent nil
+  "Highlight adjacent parentheses, just like show-paren-mode."
+  :type '(boolean)
+  :set 'hl-paren-set
+  :group 'highlight-parentheses)
+
 (defface hl-paren-face nil
   "Face used for highlighting parentheses.
 Color attributes might be overriden by `hl-paren-colors' and
@@ -101,18 +110,19 @@ This is used to prevent analyzing the same context over and over.")
   (unless (= (point) hl-paren-last-point)
     (setq hl-paren-last-point (point))
     (let ((overlays hl-paren-overlays)
-          pos1 pos2
-          (pos (point)))
+          pos1 pos2)
       (save-excursion
-        (condition-case err
-            (while (and (setq pos1 (cadr (syntax-ppss pos1)))
-                        (cdr overlays))
-              (move-overlay (pop overlays) pos1 (1+ pos1))
-              (when (setq pos2 (scan-sexps pos1 1))
-                (move-overlay (pop overlays) (1- pos2) pos2)
-                ))
-          (error nil))
-        (goto-char pos))
+        (ignore-errors
+          (when hl-paren-highlight-adjacent
+            (cond ((memq (preceding-char) '(?\) ?\} ?\] ?\>))
+                   (backward-char 1))
+                  ((memq (following-char) '(?\( ?\{ ?\[ ?\<))
+                   (forward-char 1))))
+          (while (and (setq pos1 (cadr (syntax-ppss pos1)))
+                      (cdr overlays))
+            (move-overlay (pop overlays) pos1 (1+ pos1))
+            (when (setq pos2 (scan-sexps pos1 1))
+              (move-overlay (pop overlays) (1- pos2) pos2)))))
       (dolist (ov overlays)
         (move-overlay ov 1 1)))))
 
