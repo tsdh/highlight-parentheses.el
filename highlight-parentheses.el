@@ -156,7 +156,7 @@ This is used to prevent analyzing the same context over and over.")
         (setq attributes (plist-put attributes :background (car bg))))
       (pop bg)
       (dotimes (i 2) ;; front and back
-        (push (make-overlay 0 0) hl-paren-overlays)
+        (push (make-overlay 0 0 nil t) hl-paren-overlays)
         (overlay-put (car hl-paren-overlays) 'face attributes)))
     (setq hl-paren-overlays (nreverse hl-paren-overlays))))
 
