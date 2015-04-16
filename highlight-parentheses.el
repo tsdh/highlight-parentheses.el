@@ -98,6 +98,7 @@ This is used to prevent analyzing the same context over and over.")
 
 (defvar hl-paren-timer nil
   "A timer initiating the movement of the `hl-paren-overlays'.")
+(make-variable-buffer-local 'hl-paren-timer)
 
 (defun hl-paren-highlight ()
   "Highlight the parentheses around point."
@@ -118,11 +119,20 @@ This is used to prevent analyzing the same context over and over.")
       (dolist (ov overlays)
         (move-overlay ov 1 1)))))
 
+(defcustom hl-paren-delay 0.137
+  "Fraction of seconds after which the `hl-paren-overlays' are adjusted.
+In general, this should at least be larger than your keyboard
+repeat rate in order to prevent excessive movements of the
+overlays when scrolling or moving point by pressing and holding
+\\[next-line], \\[scroll-up-command] and friends."
+  :type 'number
+  :group 'highlight-parentheses)
+
 (defun hl-paren-initiate-highlight ()
-  "Move the `hl-paren-overlays' after a short fraction of time."
+  "Move the `hl-paren-overlays' after a `hl-paren-delay' secs."
   (when hl-paren-timer
     (cancel-timer hl-paren-timer))
-  (setq hl-paren-timer (run-at-time 0.23 nil #'hl-paren-highlight)))
+  (setq hl-paren-timer (run-at-time hl-paren-delay nil #'hl-paren-highlight)))
 
 ;;;###autoload
 (define-minor-mode highlight-parentheses-mode
