@@ -3,9 +3,11 @@
 ;; Copyright (C) 2007, 2009, 2013 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.2
+;; Maintainer: Tassilo Horn <tsdh@gnu.org>
+;; Version: 1.1.0
 ;; Keywords: faces, matching
-;; URL: http://nschum.de/src/emacs/highlight-parentheses/
+;; URL: https://github.com/tsdh/highlight-parentheses.el
+;;      http://nschum.de/src/emacs/highlight-parentheses/ (old website)
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -30,25 +32,6 @@
 ;;
 ;; Enable the mode using M-x highlight-parentheses-mode or by adding it to a
 ;; hook.
-;;
-;;; Change Log:
-;;
-;;    Protect against double initialization (if used in `c-mode-hook').
-;;
-;; 2013-03-22 (1.0.2)
-;;    Fixed bug causing last color not to be displayed.
-;;
-;; 2009-03-19 (1.0.1)
-;;    Added setter for color variables.
-;;
-;; 2007-07-30 (1.0)
-;;    Added background highlighting and faces.
-;;
-;; 2007-05-15 (0.9.1)
-;;    Support for defcustom.
-;;
-;; 2007-04-26 (0.9)
-;;    Initial Release.
 ;;
 ;;; Code:
 
@@ -116,8 +99,7 @@ This is used to prevent analyzing the same context over and over.")
                 (move-overlay (pop overlays) (1- pos2) pos2)))
           (error nil))
         (goto-char pos))
-      (dolist (ov overlays)
-        (move-overlay ov 1 1)))))
+      (mapc #'delete-overlay overlays))))
 
 (defcustom hl-paren-delay 0.137
   "Fraction of seconds after which the `hl-paren-overlays' are adjusted.
@@ -167,7 +149,7 @@ overlays when scrolling or moving point by pressing and holding
       (pop bg)
       (dotimes (i 2) ;; front and back
         (push (make-overlay 0 0 nil t) hl-paren-overlays)
-        (overlay-put (car hl-paren-overlays) 'face attributes)))
+        (overlay-put (car hl-paren-overlays) 'font-lock-face attributes)))
     (setq hl-paren-overlays (nreverse hl-paren-overlays))))
 
 (defun hl-paren-color-update ()
