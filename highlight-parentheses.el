@@ -51,21 +51,21 @@
   '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4")
   "List of colors for the highlighted parentheses.
 The list starts with the inside parentheses and moves outwards."
-  :type '(repeat color)
+  :type '(choice (repeat color) function)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-background-colors nil
   "List of colors for the background highlighted parentheses.
 The list starts with the inside parentheses and moves outwards."
-  :type '(repeat color)
+  :type '(choice (repeat color) function)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-attributes nil
   "List of face attributes for the highlighted parentheses.
 The list starts with the inside parentheses and moves outwards."
-  :type plist
+  :type '(choice plist function)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
@@ -154,9 +154,15 @@ overlays when scrolling or moving point by pressing and holding
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun hl-paren-create-overlays ()
-  (let ((fg hl-paren-colors)
-        (bg hl-paren-background-colors)
-        (attr hl-paren-attributes)
+  (let ((fg (if (functionp hl-paren-colors)
+                (funcall hl-paren-colors)
+              hl-paren-colors))
+        (bg (if (functionp hl-paren-background-colors)
+                (funcall hl-paren-background-colors)
+              hl-paren-background-colors))
+        (attr (if (functionp hl-paren-attributes)
+                  (funcall hl-paren-attributes)
+                hl-paren-attributes))
         attributes)
     (while (or fg bg attr)
       (setq attributes (face-attr-construct 'hl-paren-face))
