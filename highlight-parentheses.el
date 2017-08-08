@@ -50,15 +50,22 @@
 (defcustom hl-paren-colors
   '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4")
   "List of colors for the highlighted parentheses.
-The list starts with the the inside parentheses and moves outwards."
+The list starts with the inside parentheses and moves outwards."
   :type '(repeat color)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-background-colors nil
   "List of colors for the background highlighted parentheses.
-The list starts with the the inside parentheses and moves outwards."
+The list starts with the inside parentheses and moves outwards."
   :type '(repeat color)
+  :set 'hl-paren-set
+  :group 'highlight-parentheses)
+
+(defcustom hl-paren-attributes nil
+  "List of face attributes for the highlighted parentheses.
+The list starts with the inside parentheses and moves outwards."
+  :type plist
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
@@ -149,15 +156,23 @@ overlays when scrolling or moving point by pressing and holding
 (defun hl-paren-create-overlays ()
   (let ((fg hl-paren-colors)
         (bg hl-paren-background-colors)
+        (attr hl-paren-attributes)
         attributes)
-    (while (or fg bg)
+    (while (or fg bg attr)
       (setq attributes (face-attr-construct 'hl-paren-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
+      (let ((car-fg (car fg))
+            (car-bg (car bg))
+            (car-attr (car attr)))
+        (loop for (key . (val . _rest)) on car-attr by #'cddr
+              do (setq attributes
+                       (plist-put attributes key val)))
+        (when car-fg
+          (setq attributes (plist-put attributes :foreground car-fg)))
+        (when car-bg
+          (setq attributes (plist-put attributes :background car-bg))))
       (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
       (pop bg)
+      (pop attr)
       (dotimes (i 2) ;; front and back
         (push (make-overlay 0 0 nil t) hl-paren-overlays)
         (overlay-put (car hl-paren-overlays) 'font-lock-face attributes)))
