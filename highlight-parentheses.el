@@ -50,15 +50,22 @@
 (defcustom hl-paren-colors
   '("firebrick1" "IndianRed1" "IndianRed3" "IndianRed4")
   "List of colors for the highlighted parentheses.
-The list starts with the the inside parentheses and moves outwards."
-  :type '(repeat color)
+The list starts with the inside parentheses and moves outwards."
+  :type '(choice (repeat color) function)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
 (defcustom hl-paren-background-colors nil
   "List of colors for the background highlighted parentheses.
-The list starts with the the inside parentheses and moves outwards."
-  :type '(repeat color)
+The list starts with the inside parentheses and moves outwards."
+  :type '(choice (repeat color) function)
+  :set 'hl-paren-set
+  :group 'highlight-parentheses)
+
+(defcustom hl-paren-attributes nil
+  "List of face attributes for the highlighted parentheses.
+The list starts with the inside parentheses and moves outwards."
+  :type '(choice plist function)
   :set 'hl-paren-set
   :group 'highlight-parentheses)
 
@@ -83,6 +90,9 @@ This is used to prevent analyzing the same context over and over.")
   "A timer initiating the movement of the `hl-paren-overlays'.")
 (make-variable-buffer-local 'hl-paren-timer)
 
+(defun* hl-paren-delete-overlays (&optional (overlays hl-paren-overlays))
+  (mapc #'delete-overlay overlays))
+
 (defun hl-paren-highlight ()
   "Highlight the parentheses around point."
   (unless (= (point) hl-paren-last-point)
@@ -99,7 +109,7 @@ This is used to prevent analyzing the same context over and over.")
                 (move-overlay (pop overlays) (1- pos2) pos2)))
           (error nil))
         (goto-char pos))
-      (mapc #'delete-overlay overlays))))
+      (hl-paren-delete-overlays overlays))))
 
 (defcustom hl-paren-delay 0.137
   "Fraction of seconds after which the `hl-paren-overlays' are adjusted.
@@ -120,17 +130,21 @@ overlays when scrolling or moving point by pressing and holding
 (define-minor-mode highlight-parentheses-mode
   "Minor mode to highlight the surrounding parentheses."
   nil " hl-p" nil
-  (mapc 'delete-overlay hl-paren-overlays)
+  (hl-paren-delete-overlays)
   (kill-local-variable 'hl-paren-overlays)
   (kill-local-variable 'hl-paren-last-point)
   (remove-hook 'post-command-hook 'hl-paren-initiate-highlight t)
+  (remove-hook 'before-revert-hook 'hl-paren-delete-overlays)
+  (remove-hook 'change-major-mode-hook 'hl-paren-delete-overlays)
   (when (and highlight-parentheses-mode
              ;; Don't enable in *Messages* buffer.
              ;; https://github.com/tsdh/highlight-parentheses.el/issues/14
              (not (eq major-mode 'messages-buffer-mode))
              (not (string= (buffer-name) "*Messages*")))
     (hl-paren-create-overlays)
-    (add-hook 'post-command-hook 'hl-paren-initiate-highlight nil t)))
+    (add-hook 'post-command-hook 'hl-paren-initiate-highlight nil t)
+    (add-hook 'before-revert-hook 'hl-paren-delete-overlays)
+    (add-hook 'change-major-mode-hook 'hl-paren-delete-overlays)))
 
 ;;;###autoload
 (define-globalized-minor-mode global-highlight-parentheses-mode
@@ -140,17 +154,31 @@ overlays when scrolling or moving point by pressing and holding
 ;;; overlays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun hl-paren-create-overlays ()
-  (let ((fg hl-paren-colors)
-        (bg hl-paren-background-colors)
+  (let ((fg (if (functionp hl-paren-colors)
+                (funcall hl-paren-colors)
+              hl-paren-colors))
+        (bg (if (functionp hl-paren-background-colors)
+                (funcall hl-paren-background-colors)
+              hl-paren-background-colors))
+        (attr (if (functionp hl-paren-attributes)
+                  (funcall hl-paren-attributes)
+                hl-paren-attributes))
         attributes)
-    (while (or fg bg)
+    (while (or fg bg attr)
       (setq attributes (face-attr-construct 'hl-paren-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
+      (let ((car-fg (car fg))
+            (car-bg (car bg))
+            (car-attr (car attr)))
+        (loop for (key . (val . _rest)) on car-attr by #'cddr
+              do (setq attributes
+                       (plist-put attributes key val)))
+        (when car-fg
+          (setq attributes (plist-put attributes :foreground car-fg)))
+        (when car-bg
+          (setq attributes (plist-put attributes :background car-bg))))
       (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
       (pop bg)
+      (pop attr)
       (dotimes (i 2) ;; front and back
         (push (make-overlay 0 0 nil t) hl-paren-overlays)
         (overlay-put (car hl-paren-overlays) 'font-lock-face attributes)))
@@ -160,7 +188,7 @@ overlays when scrolling or moving point by pressing and holding
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
       (when hl-paren-overlays
-        (mapc 'delete-overlay hl-paren-overlays)
+        (hl-paren-delete-overlays)
         (setq hl-paren-overlays nil)
         (hl-paren-create-overlays)
         (let ((hl-paren-last-point -1)) ;; force update
