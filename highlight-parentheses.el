@@ -109,9 +109,9 @@ This is used to prevent analyzing the same context over and over.")
       (save-excursion
         (ignore-errors
           (when hl-paren-highlight-adjacent
-            (cond ((memq (preceding-char) '(?\) ?\} ?\]))
+            (cond ((memq (preceding-char) '(?\) ?\} ?\] ?\>))
                    (backward-char 1))
-                  ((memq (following-char) '(?\( ?\{ ?\[))
+                  ((memq (following-char) '(?\( ?\{ ?\[ ?\<))
                    (forward-char 1))))
           (while (and (setq pos1 (cadr (syntax-ppss pos1)))
                       (cdr overlays))
