@@ -9,8 +9,8 @@
 ;; Keywords: faces, matching
 ;; URL: https://github.com/tsdh/highlight-parentheses.el
 ;;      http://nschum.de/src/emacs/highlight-parentheses/ (old website)
-;; Package-Requires: ((emacs "24.3"))
-;; Compatibility: GNU Emacs 24.x, GNU Emacs 25.x, GNU Emacs 26.x
+;; Package-Requires: ((emacs "24.3") (cl-lib "0.6.1"))
+;; Compatibility: GNU Emacs 24.3, GNU Emacs 25.x, GNU Emacs 26.x, Emacs 27.x
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
