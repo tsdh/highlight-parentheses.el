@@ -99,7 +99,7 @@ The list starts with the inside parentheses and moves outwards."
   :group 'highlight-parentheses)
 
 (define-obsolete-variable-alias 'hl-paren-delay
-  'highlight-parentheses-delay)
+  'highlight-parentheses-delay "2.0.0")
 (defcustom highlight-parentheses-delay 0.137
   "Fraction of seconds after which the overlays are adjusted.
 In general, this should at least be larger than your keyboard
@@ -147,7 +147,7 @@ overlays in it instead."
   (mapc #'delete-overlay overlays))
 
 (define-obsolete-function-alias 'hl-paren-highlight
-  'highlight-parentheses--highlight)
+  'highlight-parentheses--highlight "2.0.0")
 (defun highlight-parentheses--highlight ()
   "Highlight the parentheses around point."
   (unless (= (point) highlight-parentheses--last-point)
